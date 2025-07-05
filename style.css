@@ -5,7 +5,7 @@ body {
 }
 
 .hero {
-    background-image: url(/mijnwebsite/images/WebsiteCover.png);
+    background-image: url(../images/WebsiteCover.png);
     background-size: cover;
     background-position: center;
     height: 100vh;
