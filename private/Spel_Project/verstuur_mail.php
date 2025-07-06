@@ -44,12 +44,12 @@ $mail = new PHPMailer(true);
 try {
     // --- SERVER INSTELLINGEN (VUL JE EIGEN GEGEVENS IN!) ---
     $mail->isSMTP();
-    $mail->Host       = 'smtpout.secureserver.net';       // SMTP server van GoDaddy
+    $mail->Host       = 'smtp.office365.com';       // SMTP server van GoDaddy
     $mail->SMTPAuth   = true;
     $mail->Username   = 'info@roni.website';              // Je volledige e-mailadres
     $mail->Password   = 'R2001ony!';      // BELANGRIJK: Vervang dit door je nieuwe, werkende wachtwoord!
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;   // Gebruik SSL
-    $mail->Port       = 465;                          // Poort voor SSL
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Gebruik SSL
+    $mail->Port       = 587;                          // Poort voor SSL
 
     // --- AFZENDER ---
     $mail->setFrom('info@roni.website', 'Roni Opstelling Tool');
