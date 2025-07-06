@@ -27,30 +27,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCTIES ---
 
-/**
- * Toont een tijdelijk statusbericht onderaan het scherm.
- */
-function showStatusMessage(message, type = 'success') {
-    statusText.textContent = message;
-    statusMessage.className = 'fixed bottom-4 right-4 text-white p-4 rounded-lg shadow-lg z-50 transition-transform duration-300 ease-out transform'; // Reset classes
-    
-    // Bepaal kleur en verwijder 'hidden' om te tonen
-    statusMessage.classList.add(type === 'success' ? 'bg-green-500' : 'bg-red-500');
-    statusMessage.classList.remove('hidden', 'translate-y-full');
+    /**
+    * Toont een tijdelijk statusbericht onderaan het scherm.
+    */
+    function showStatusMessage(message, type = 'success') {
+        statusText.textContent = message;
+        statusMessage.className = 'fixed bottom-4 right-4 text-white p-4 rounded-lg shadow-lg z-50 transition-transform duration-300 ease-out transform'; // Reset classes
+        
+        statusMessage.classList.add(type === 'success' ? 'bg-green-500' : 'bg-red-500');
+        statusMessage.classList.remove('hidden', 'translate-y-full');
 
-    // Start de timer om het bericht te verbergen
-    setTimeout(() => {
-        // Stap 1: Schuif het element uit beeld
-        statusMessage.classList.add('translate-y-full');
-
-        // Stap 2: Wacht tot de animatie (300ms) klaar is en voeg dan 'hidden' toe
-        // We gebruiken een iets langere timeout (350ms) voor de zekerheid.
         setTimeout(() => {
-            statusMessage.classList.add('hidden');
-        }, 350);
+            statusMessage.classList.add('translate-y-full');
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 350);
+        }, 3000);
+    }
 
-    }, 3000); // Het bericht blijft 3 seconden zichtbaar
-}
     /**
      * Controleert de schermoriëntatie.
      */
@@ -165,7 +159,6 @@ function showStatusMessage(message, type = 'success') {
 
         html2canvas(field, { useCORS: true, backgroundColor: null, scale: 1 })
             .then(canvas => {
-                // De belangrijke aanpassing is hier:
                 currentScreenshotData = canvas.toDataURL('image/jpeg', 0.5);
 
                 screenshotMessage.classList.remove('hidden');
@@ -175,7 +168,12 @@ function showStatusMessage(message, type = 'success') {
                 }, 1500);
             })
             .catch(err => {
-                // ... (rest van de code)
+                showStatusMessage('Fout bij maken van screenshot.', 'error');
+                console.error("html2canvas error:", err);
+                button.disabled = false;
+            })
+            .finally(() => {
+                field.classList.remove('no-hover');
             });
     }
 
@@ -274,70 +272,62 @@ function showStatusMessage(message, type = 'success') {
         currentScreenshotData = null;
     });
 
-    // In main.js
+    // --- !! HIER IS DE BELANGRIJKE WIJZIGING !! ---
+    // Dit blok vervangt de oude EmailJS code.
+    emailForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const submitButton = event.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Bezig met versturen...';
 
-    // ... (al je andere code in main.js blijft hetzelfde) ...
+        showStatusMessage('Opstelling wordt verstuurd...', 'success');
 
-emailForm.addEventListener('submit', async (event) => {
-    event.preventDefault(); // Voorkom dat de pagina herlaadt
+        const formData = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            screenshot: currentScreenshotData // De base64-string van de screenshot
+        };
 
-    const submitButton = event.target.querySelector('button[type="submit"]');
-    const submitText = submitButton.querySelector('.submit-text');
-    const loadingSpinner = submitButton.querySelector('.loading-spinner');
+        try {
+            // Verstuur de data naar je eigen PHP script met de fetch API
+            const response = await fetch('api/send_email.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
 
-    // Stop als het formulier niet geldig is
-    if (!emailForm.checkValidity()) {
-        showStatusMessage('Vul alsjeblieft alle velden correct in.', 'error');
-        emailForm.reportValidity();
-        return;
-    }
-    
-    // Toon de laadstatus op de knop
-    submitButton.disabled = true;
-    submitText.textContent = 'Bezig...';
-    loadingSpinner.classList.remove('hidden');
+            const result = await response.json();
 
-    // Bereid de data voor om te versturen
-    const formData = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        screenshot: currentScreenshotData 
-    };
+            if (response.ok && result.success) {
+                showStatusMessage('Opstelling succesvol verstuurd!', 'success');
+                emailFormContainer.classList.add('hidden');
+                emailForm.reset();
+                currentScreenshotData = null;
+            } else {
+                console.error("Fout van server:", result.message);
+                showStatusMessage(`Versturen mislukt: ${result.message}`, 'error');
+            }
 
-    try {
-        // Verstuur de data naar ons EIGEN PHP script
-        const response = await fetch('send-email.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const result = await response.json();
-
-        // Verwerk het antwoord van ons PHP script
-        if (result.status === 'success') {
-            showStatusMessage('Opstelling succesvol verstuurd!', 'success');
-            emailFormContainer.classList.add('hidden');
-            emailForm.reset();
-        } else {
-            throw new Error(result.message);
+        } catch (error) {
+            console.error("Fout bij het versturen:", error);
+            showStatusMessage('Versturen mislukt door een netwerkfout.', 'error');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Verstuur mijn opstelling';
+            
+            // Maak de screenshot knop weer actief
+            const activeGameContainer = document.querySelector('.game-container:not(.hidden)');
+            if (activeGameContainer) {
+                const screenshotBtn = activeGameContainer.querySelector('.btn-primary');
+                if (screenshotBtn) {
+                    screenshotBtn.disabled = false;
+                }
+            }
         }
-    } catch (error) {
-        console.error("Fout bij het versturen:", error);
-        showStatusMessage(`Fout: ${error.message}`, 'error');
-    } finally {
-        // Herstel de knop, of het nu goed of fout ging
-        submitButton.disabled = false;
-        submitText.textContent = 'Verstuur mijn opstelling';
-        loadingSpinner.classList.add('hidden');
-    }
-});
-
-// ... (de rest van je main.js code blijft hetzelfde) ...
+    });
 
     // "Nieuwe speler" knoppen
     function addNewPlayerTemplate(panelId, prefix) {
