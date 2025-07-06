@@ -15,7 +15,7 @@
 </head>
 <body class="overflow-hidden bg-gray-100">
 
-    <div id="orientation-warning" class="hidden">
+    <div id="orientation-warning" class="hidden fixed inset-0 bg-black bg-opacity-95 text-white flex-col justify-center items-center text-center z-[100] p-4">
         <p class="text-3xl mb-4">👋</p>
         <p>Draai je scherm naar de landschapsmodus (liggend) voor de beste ervaring.</p>
     </div>
@@ -37,12 +37,11 @@
                 <div id="football-player-panel" class="player-panel">
                     <h3 class="panel-title">Spelers</h3>
                     <div class="draggable-template">P1</div>
-                    <div class="draggable-template">P2</div>
                     <button id="add-football-player-btn" class="btn btn-secondary w-full text-sm mt-auto">Nieuwe Speler</button>
                 </div>
             </div>
             <div class="controls">
-                <button id="football-screenshot-btn" class="btn btn-primary"><i class="fas fa-camera mr-2"></i>Verstuur Opstelling</button>
+                <button id="football-screenshot-btn" class="btn btn-primary screenshot-btn"><i class="fas fa-camera mr-2"></i>Verstuur Opstelling</button>
                 <button id="football-back-btn" class="btn btn-secondary">Terug</button>
             </div>
         </div>
@@ -57,7 +56,7 @@
                 </div>
             </div>
             <div class="controls">
-                <button id="basketball-screenshot-btn" class="btn btn-primary"><i class="fas fa-camera mr-2"></i>Verstuur Opstelling</button>
+                <button id="basketball-screenshot-btn" class="btn btn-primary screenshot-btn"><i class="fas fa-camera mr-2"></i>Verstuur Opstelling</button>
                 <button id="basketball-back-btn" class="btn btn-secondary">Terug</button>
             </div>
         </div>
@@ -72,15 +71,17 @@
                 </div>
             </div>
             <div class="controls">
-                <button id="tennis-screenshot-btn" class="btn btn-primary"><i class="fas fa-camera mr-2"></i>Verstuur Opstelling</button>
+                <button id="tennis-screenshot-btn" class="btn btn-primary screenshot-btn"><i class="fas fa-camera mr-2"></i>Verstuur Opstelling</button>
                 <button id="tennis-back-btn" class="btn btn-secondary">Terug</button>
             </div>
         </div>
 
-    </div> <div id="screenshot-message" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-40">
+    </div> 
+    
+    <div id="screenshot-message" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-40">
         <div class="bg-white p-8 rounded-lg shadow-xl text-center">
-            <p class="text-2xl font-bold text-gray-800 mb-4">Screenshot succesvol gemaakt!</p>
-            <p class="text-gray-600">Je wordt doorgestuurd naar het formulier...</p>
+            <p class="text-2xl font-bold text-gray-800 mb-4">Screenshot wordt gemaakt...</p>
+            <p class="text-gray-600">Een moment geduld alstublieft.</p>
         </div>
     </div>
 
@@ -90,13 +91,10 @@
             <form id="email-form" class="flex flex-col">
                 <label for="firstName" class="block text-gray-700 text-sm font-bold mb-2">Voornaam:</label>
                 <input type="text" id="firstName" name="firstName" class="form-input" required>
-
                 <label for="lastName" class="block text-gray-700 text-sm font-bold mb-2">Achternaam:</label>
                 <input type="text" id="lastName" name="lastName" class="form-input" required>
-
                 <label for="email" class="block text-gray-700 text-sm font-bold mb-2">E-mailadres:</label>
                 <input type="email" id="email" name="email" class="form-input" required>
-
                 <button type="submit" class="btn btn-primary mt-4">Verstuur mijn opstelling</button>
                 <button type="button" id="cancel-form-btn" class="btn btn-secondary mt-2">Annuleren</button>
             </form>
@@ -109,13 +107,11 @@
             <div>
                 <label for="editPlayerName" class="block text-gray-700 text-sm font-bold mb-2">Naam:</label>
                 <input type="text" id="editPlayerName" class="form-input mb-4" maxlength="15">
-
                 <label for="editPlayerImage" class="block text-gray-700 text-sm font-bold mb-2">Afbeelding:</label>
                 <input type="file" id="editPlayerImage" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4">
                 <div class="flex justify-center mb-6">
                     <img id="editPlayerImagePreview" src="https://placehold.co/80x80" alt="Image Preview" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200">
                 </div>
-
                 <div class="flex flex-col gap-2">
                     <button type="button" id="save-player-btn" class="btn btn-primary w-full">Opslaan</button>
                     <button type="button" id="delete-player-btn" class="btn w-full bg-red-600 hover:bg-red-700 text-white">Verwijder Speler</button>
@@ -128,7 +124,6 @@
     <div id="status-message" class="hidden fixed bottom-4 right-4 text-white p-4 rounded-lg shadow-lg z-50 transition-transform duration-300 ease-out transform translate-y-full">
         <p id="status-text"></p>
     </div>
-
 
     <script src="js/main.js"></script>
 </body>
